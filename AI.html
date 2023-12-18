@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<script src='https://npmcdn.com/mapbox-gl-circle/dist/mapbox-gl-circle.min.js'></script>
+
+<script src='https://api.mapbox.com/mapbox-gl-js/v3.0.0/mapbox-gl.js'></script>
+<link href='https://api.mapbox.com/mapbox-gl-js/v3.0.0/mapbox-gl.css' rel='stylesheet' />
+
+
+<div id="app"></div>
+
+<div id="resp"></div>
+
+<style>.container {
+  display:flex;
+  flex-wrap:wrap; /* this */
+  gap:10px;
+}
+.container > div {
+  height:100px;
+  flex:max(400px, (100% - 20px)/3); /* and this */
+  
+}
+.input{text-align:center;
+ padding-top: 30px;
+  padding-right: 30px;
+  padding-bottom: 30px;
+  padding-left: 80px;
+
+#btn{width:25%}
+}
+#base{
+background-color:blue
+display: inline;
+  margin-right: 10px;
+
+}
+#canv{
+  width:700px;
+    word-wrap: break-word
+}
+#imgdecan{
+  width:700px;
+    height:500px;
+}
+</style>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jscolor/2.4.5/jscolor.min.js"></script>
+	<script src="https://unpkg.com/brain.js"></script>
+<script>
+  function ZoomToCCTV(cctvID) 
+  
+  {
+  if (cctvID==0xC8){alert("ok")
+  _("req").innerHTML= `<p>This is 200</p>`
+  
+  } else if(cctvID==400) {alert("error")
+  _("req").innerHTML= `<p>This is 400</p>`
+  } 
+
+} 
+var network = new brain.NeuralNetwork();
+network.train([
+			//Fondo negro (entrada en 0s) = texto blanco (salida = 1)
+			{input: {rojo: 0, verde: 0, azul: 0}, output: {color: 1}},
+			//Fondo blanco (entrada en 1s) = texto negro (salida = 0)
+			{input: {rojo: 1, verde: 1, azul: 1}, output: {color: 0}},
+			//Fondo verde, texto negro
+			{input: {rojo: 0, verde: 1, azul: 0}, output: {color: 0}},
+			//Fondo azul, texto blanco
+			{input: {rojo: 0, verde: .43, azul: 1}, output: {color: 1}},
+			//Fondo rojo, texto blanco
+			{input: {rojo: 1, verde: 0, azul: 0}, output: {color: 1}},
+		]);
+function update(color) {
+
+			//Cuando hice el video, existia color.rgb
+			//Ahora existe color.channels y dentro tiene varios componentes.
+			//Aqui hacemos el objeto "rgb" para que sea similar al video
+			var rgb = [color.channels.r, color.channels.g, color.channels.b];
+			//console.log(rgb);
+
+			var div = document.getElementById("app");
+			div.style.background = color.toHEXString(); //Nueva forma para poner el color de fondo
+			var btn = document.getElementById("btn");
+			
+
+			//Tomar el fondo actual elegido por el usuario,
+			//para usarlo de entrada para que la red nos de su
+			//prediccion del mejor color de texto a utilizar
+			var entrada = {
+				rojo: rgb[0]/255,
+				verde: rgb[1]/255,
+				azul: rgb[2]/255,
+			};
+
+			//Obtener la prediccion de la red
+			var resultado = network.run(entrada);
+			console.log(entrada);
+
+			//Si resultado > .5, se considera color de texto blanco
+			if (resultado.color > .5) {
+				div.style.color = "white";
+				btn.style.background = "black";
+				btn.style.color = "white";
+				
+
+				
+				
+			}  else {
+				div.style.color = "black";
+				btn.style.background = "white";
+				btn.style.color = "black";
+				
+			}
+		}
+
+
+
+function fun(){
+var input = _("input").value.toUpperCase();
+var inputwos = _("input").value.toUpperCase().split(" ").join("");
+console.log(inputwos)
+
+if (inputwos==="ERESINTELIGENTE?"){
+
+_("req").innerHTML= `<p>Soy lo inteligente que mi creador lo permita. aun estoy aprendiendo como puedo aprender!</p>`
+
+
+}
+
+if (input==="BOMBA"){alert("peligro Privilegios")}
+if (input==="HACK"){alert("peligro")}
+if (inputwos==="ENQUEPIENSAS?"){
+
+_("resp").innerHTML= `<p>Como sabes no tengo la capacidad de pensar pero si te puedo decir mi creador estaba pensando en que le encanta el aprendizaje y esta tratando de hacer lo mismo Conmigo, lo Cual es muy interezante .</p>
+<p>no cres ?</p> <a href="javascript:ZoomToCCTV(200)">Si </a><br><a href="javascript:ZoomToCCTV(449)">No </a>
+`}
+if (input==="ERES INTELIGENTE?"){
+
+_("resp").innerHTML= `<p>Soy lo inteligente que mi creador lo permita. aun estoy aaprendiendo como puedo aprender!</p>`
+
+
+}
+_("req").innerHTML = `${datos.map(function(x){return `${x.content} ${input}`}).join("")}`
+}
+const datos =[{content: "¡Hola! Soy un Nanochatbot AI en JavaScript. ¿En que puedo ayudarte?", training:"Hasta luego!  un placer ayudarte", Mount:"Claro que puedo ayudarte con ", Hola:"Hola! Soy un chatbot AI en JavaScript. creado por nuni en dic/04/2023 ", CAF:"HA"}]
+
+function _(x){return document.getElementById(x);}
+_("app").innerHTML = `
+
+<div class="input" ><input id="input" type="text"size="50" onkeyup="fun()"><br> <button id="btn"onclick="joker()">?</button>
+</div>
+<div class="container"><div id="req">${datos.map(function(x){return `${x.content} `}).join("")}</div></div><input data-jscolor="{value:'#CC66FF'}", onInput="update(this.jscolor)">
+`
+
+
+function joker(){
+
+var input = _("input").value
+var input = input.toUpperCase()
+var date = new Date()
+ const link = document.createElement("a");
+ var d = new Date();
+d = (d.getMonth()+1)+'/'+d.getDate()+'/'+d.getFullYear()+' '+(d.getHours() > 12 ? d.getHours() - 12 : d.getHours())+':'+d.getMinutes()+' '+(d.getHours() >= 12 ? "PM" : "AM");
+
+ const file = new Blob(["[{\"debugger\":","\"",input ,"\"",",","\"time \""," : ", "\"",d,"\"","}]" ], { type: 'text/plain' });
+  link.href = URL.createObjectURL(file);
+         link.download = "sample.json";
+         link.click();
+         URL.revokeObjectURL(link.href);
+
+if (input==="COMO TE LLAMAS?"){
+
+_("req").innerHTML= `<p>Mi Creador me Dio el nombre de Hefesto</p><p> efesto es el dios griego del fuego, la metalurgia y la tecnología.</p><p> Se le atribuye la creación de herramientas y objetos ingeniosos, incluyendo las armas divinas de los dioses.</p>`
+
+
+}
+if(input==="CANVAS"){
+
+_("req").innerHTML= `
+<input type="file" onchange="onFileSelected(event)">
+<div>
+<canvas id="canvas"></canvas>
+</div>
+`
+
+
+}
+
+if (input==="ERES INTELIGENTE?"){
+
+_("req").innerHTML= `<p>Aun No :( , pero estoy en ese processo. Puedes cambiar el color del encabezado</p>`
+
+
+}
+if(input === "CAF"){return  _("resp").innerHTML= `${datos.map(function(x){return `${x.CAF}`}).join("")}`}
+const regx = /CUANTO ES ([0-9]+)/g;
+const matches = regx.exec(input);
+console.log(matches)
+if(matches ){
+const name =matches[1];
+const lname =matches.index;
+_("req").innerHTML = `<h2> ${lname}  </h2><p>afortunadamente por mtivos de seguridad no guardare tu nombre y lo olvidare como una memoria selectiva</p>	`
+}else{console.log ("no match")}
+
+
+const regex = /NOMBRE ES ([A-Z]+)/;
+const match = regex.exec(input);
+console.log(match)
+if(match ){
+const name =match[1];
+_("req").innerHTML = `<h2>Hola ${name}  </h2><p>afortunadamente por mtivos de seguridad no guardare tu nombre y lo olvidare como una memoria selectiva</p>	`
+}else{console.log ("no match")}
+
+
+if (input === ""){
+_("req").innerHTML = "Nada Puede Salir de la nada."
+}
+else{
+if(input ==="MODULO"){return  _("resp").innerHTML= `<h1>${datos.map(function(x){return `${x.Mount}${input}<br>
+ <input id="b" placeholder="B"> <br><input id="a" placeholder="A"><button onclick ="mod()">ok</button>
+<div id="cal"></div>`}).join("")}</h1>`
+
+}
+
+if(input === "HTML"){return  _("resp").innerHTML= `<h1>${datos.map(function(x){return `${x.html}`
+}).join("")}</h1>
+
+<iframe src="app.html" height="800px" width="100%" title="Iframe Example"></iframe>`}
+if(input === "HOLA"){return  _("resp").innerHTML= `<h1>${datos.map(function(x){return `${x.Hola}`}).join("")}</h1>`}
+if(input === "BYE"){return  _("resp").innerHTML= `<h1>${datos.map(function(x){return `${x.training}`}).join("")}</h1>`}
+
+
+if(input === "CREAR FUNCION"){return  _("resp").innerHTML= `<h1>${datos.map(function(x){return `${x.Mount}${input}`}).join("")}</h1>`}
+
+
+
+if(input === "GPS"){ 
+
+
+navigator.geolocation.getCurrentPosition(position => {
+
+  const { latitude, longitude } = position.coords;
+  var poslng = longitude;
+ var poslat = latitude
+ 
+
+mapboxgl.accessToken = 'pk.eyJ1IjoianVhbm9tYXIxcHIiLCJhIjoiY2w1bnUxOGI1MTEzYzNqcGl6bXh4NGx1OSJ9.DTlAy4vj5EDEDTG7xhUspQ';
+const map = new mapboxgl.Map({
+	container: 'map', // container ID
+	style: 'mapbox://styles/mapbox/streets-v12', // style URL
+	center: [ poslng, poslat], // starting position [lng, lat]
+	zoom: 15, // starting zoom
+	
+});
+var myCircle = new MapboxCircle({lat: poslat, lng: poslng}, 87, {
+    editable: true,
+    minRadius: 100,
+    fillColor: '#29AB87'
+}).addTo(map);})}
+
+_("resp").innerHTML =	`
+ <div id='map' style='width:96%; height: 700px;'></div>
+
+`}
+if(input === "NEURONAS"){ 
+_("resp").innerHTML = `<a href="javascript:ZoomToCCTV(200)">n1</a><br><a href="javascript:ZoomToCCTV(400)">n2</a>`
+
+}
+
+
+}
+function mod(){
+var a = _("a").value;
+var b =  _("b").value;
+_("cal").innerHTML =	`
+
+<h3>Modulo ${a%b}</h3>
+`}
+
+function onFileSelected(event) {
+  var selectedFile = event.target.files[0];
+  var reader = new FileReader();
+
+  var imgtag = document.getElementById("canvas");
+  imgtag.title = selectedFile.name;
+  console.log(imgtag.title)
+ 
+var ctx = imgtag .getContext("2d");
+canvas.width = imgtag.width;
+canvas.height = imgtag.height;
+
+  reader.onload = function(event) {
+    imgtag.src = event.target.result;
+    algo =imgtag.src
+    _("resp").innerHTML =	`<button onclick="myFunction()">Copy text </button>
+    <img src=${imgtag.src} id="imgdecan">
+    <p id="canv">${algo}</p>
+`
+  };
+
+  reader.readAsDataURL(selectedFile);
+}
+function myFunction() {
+  // Get the text field
+  var copyText = document.getElementById("canv").innerHTML;
+  navigator.clipboard.writeText(copyText);
+     }
+
+</script>
+
+
+</html>
